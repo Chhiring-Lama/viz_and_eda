@@ -447,4 +447,4 @@ weather_df |>
     ## Warning: Removed 17 rows containing missing values or values outside the scale range
     ## (`geom_point()`).
 
-![](Vis1_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+<img src="Vis1_files/figure-gfm/unnamed-chunk-25-1.png" width="90%" />
