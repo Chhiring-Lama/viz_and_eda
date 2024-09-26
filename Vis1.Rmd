@@ -207,4 +207,22 @@ ggplot(weather_df, aes(y = name, x = prcp, fill = name)) +
   geom_density_ridges(scale = .85) 
 ```
 
-So far, the boxplot lets us look at the distribution and identify the outliers. 
+So far, the box plot lets us look at the distribution and identify the outliers. 
+
+## Saving and embedding plots
+```{r}
+gg_weather = 
+  weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name)) +
+  geom_point()
+
+ggsave("plots/ggp_weather.pdf", gg_weather, height = 5, width = 6)
+```
+
+embedding plots
+```{r, fig.width = 8, fig.asp = .6, out.width = "90%"}
+weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name)) +
+  geom_point()
+```
+
