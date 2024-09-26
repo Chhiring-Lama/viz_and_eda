@@ -65,3 +65,66 @@ gg_weather_scatterplot
     ## (`geom_point()`).
 
 ![](Vis1_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+Check why some rows are missing
+
+## fancier scatterplots
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = 0.6, size = 0.8) +
+  geom_smooth(se = FALSE)
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis1_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+Where we define the `aes` matters. The smoothing looks different when
+used in `geom` where we only define the color grouping only for the
+scatterplot, the grouping is not global so `geom_smooth` does not
+recognize this.
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(alpha = 0.6, size = 0.8, aes(color = name)) +
+  geom_smooth(se = FALSE)
+```
+
+    ## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis1_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+Use facet
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(alpha = 0.6, size = 0.8, aes(color = name)) +
+  geom_smooth(se = FALSE) +
+  facet_grid(.~name)
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis1_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->

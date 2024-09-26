@@ -45,6 +45,34 @@ gg_weather_scatterplot <- ggplot(weather_df, aes(x = tmin, y = tmax)) +
 gg_weather_scatterplot
 ```
 
+Check why some rows are missing
+```{r}
+
+```
 
 
+## fancier scatterplots
 
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = 0.6, size = 0.8) +
+  geom_smooth(se = FALSE)
+```
+
+Where we define the `aes` matters. The smoothing looks different when used in `geom` where we only define the color grouping only for the scatterplot, the grouping is not global so `geom_smooth` does not recognize this. 
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(alpha = 0.6, size = 0.8, aes(color = name)) +
+  geom_smooth(se = FALSE)
+```
+
+Use facet
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(alpha = 0.6, size = 0.8, aes(color = name)) +
+  geom_smooth(se = FALSE) +
+  facet_grid(.~name)
+```
