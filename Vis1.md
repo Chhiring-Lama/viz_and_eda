@@ -94,7 +94,7 @@ recognize this.
 
 ``` r
 weather_df |> 
-  ggplot(aes(x = tmin, y = tmax)) +
+  ggplot(aes(x = date, y = tmax)) +
   geom_point(alpha = 0.6, size = 0.8, aes(color = name)) +
   geom_smooth(se = FALSE)
 ```
@@ -128,3 +128,96 @@ weather_df |>
     ## (`geom_point()`).
 
 ![](Vis1_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name, size = prcp)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(se = FALSE) +
+  facet_grid(.~name)
+```
+
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: The following aesthetics were dropped during statistical transformation: size.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+    ## The following aesthetics were dropped during statistical transformation: size.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+    ## The following aesthetics were dropped during statistical transformation: size.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis1_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+## Learning Assessment
+
+Write a code chain that starts with weather_df; focuses only on Central
+Park, converts temperatures to Fahrenheit, makes a scatterplot of min
+vs. max temperature, and overlays a linear regression line (using
+options in geom_smooth())
+
+### Solution
+
+``` r
+weather_df |> 
+  filter(name == "CentralPark_NY") |> 
+  mutate(tmax_fahrenheit = ((tmax * 9/5) + 32), 
+         tmin_fahrenheit = ((tmin * 9/5) + 32)) |> 
+  ggplot(aes(x = tmin_fahrenheit, y = tmax_fahrenheit, size = prcp)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(se = FALSE, method = "lm")
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+    ## Warning: The following aesthetics were dropped during statistical transformation: size.
+    ## ℹ This can happen when ggplot fails to infer the correct grouping structure in
+    ##   the data.
+    ## ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+    ##   variable into a factor?
+
+![](Vis1_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+We can look at the density at certain point in the graph too.
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex()
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_binhex()`).
+
+![](Vis1_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(color = "blue")
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis1_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->

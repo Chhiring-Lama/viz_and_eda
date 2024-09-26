@@ -8,6 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(rnoaa)
+library(ggridges)
 ```
 
 ```{r}
@@ -63,7 +64,7 @@ weather_df |>
 Where we define the `aes` matters. The smoothing looks different when used in `geom` where we only define the color grouping only for the scatterplot, the grouping is not global so `geom_smooth` does not recognize this. 
 ```{r}
 weather_df |> 
-  ggplot(aes(x = tmin, y = tmax)) +
+  ggplot(aes(x = date, y = tmax)) +
   geom_point(alpha = 0.6, size = 0.8, aes(color = name)) +
   geom_smooth(se = FALSE)
 ```
@@ -76,3 +77,134 @@ weather_df |>
   geom_smooth(se = FALSE) +
   facet_grid(.~name)
 ```
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name, size = prcp)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(se = FALSE) +
+  facet_grid(.~name)
+```
+
+## Learning Assessment
+Write a code chain that starts with weather_df; focuses only on Central Park, converts temperatures to Fahrenheit, makes a scatterplot of min vs. max temperature, and overlays a linear regression line (using options in geom_smooth())
+
+### Solution
+```{r}
+weather_df |> 
+  filter(name == "CentralPark_NY") |> 
+  mutate(tmax_fahrenheit = ((tmax * 9/5) + 32), 
+         tmin_fahrenheit = ((tmin * 9/5) + 32)) |> 
+  ggplot(aes(x = tmin_fahrenheit, y = tmax_fahrenheit, size = prcp)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(se = FALSE, method = "lm")
+
+```
+
+We can look at the density at certain point in the graph too.
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex()
+```
+
+## Learning Assessment
+In the preceding, we set the alpha aesthetic “by hand” instead of mapping it to a variable. This is possible for other aesthetics too. To check your understanding of this point, try to explain why the two lines below don’t produce the same result:
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(color = "blue")
+
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax,color = "blue")) +
+  geom_point()
+```
+
+### Solution:
+In the second case, because we put the color in aesthetic which take variables, it created a variable whose value is "blue" for all cases, and ends up coloring with a single color. The primary chose for R is red. 
+
+## Univariate plots
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram(position = "dodge", binwidth = 2)
+```
+
+How we can fix this:
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram(position = "dodge", binwidth = 2) +
+  facet_grid(.~name)
+```
+
+We can use density plot instead
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_density(alpha = .3)
+```
+
+Using box plot
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_boxplot(alpha = .3)
+```
+
+A variation of box plot: violin plot (this helps identify difference between multiple groups, and also identify bimodal data distribution)
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin(alpha = 0.3) + 
+  stat_summary(fun = "median", color = "blue")
+```
+
+Another variation: ridge plot
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmax, y = name)) + 
+  geom_density_ridges(scale = .85)
+```
+
+## Learning Assessment: 
+Make plots that compare precipitation across locations. Try a histogram, a density plot, a boxplot, a violin plot, and a ridgeplot; use aesthetic mappings to make your figure readable
+
+### Solution
+```{r}
+ggplot(weather_df, aes(y = prcp, fill = name)) +
+  geom_histogram(position = "dodge", alpha = 0.8, binwidth = 50) +
+  facet_grid(name~.)
+```
+
+```{r}
+ggplot(weather_df, aes(y = prcp, fill = name)) +
+  geom_density(alpha = 0.8)
+```
+
+can log-transform the density plot
+```{r}
+ggplot(weather_df, aes(y = prcp, fill = name)) +
+  geom_density(alpha = 0.8) +
+  scale_y_log10()
+```
+
+```{r}
+ggplot(weather_df, aes(x = name, y = prcp, fill = name)) +
+  geom_boxplot(alpha = 0.8) 
+```
+
+```{r}
+ggplot(weather_df, aes(x = name, y = prcp, fill = name)) +
+  geom_violin(alpha = 0.8) + 
+  stat_summary(fun = "median", color = "blue")
+```
+
+```{r}
+ggplot(weather_df, aes(y = name, x = prcp, fill = name)) +
+  geom_density_ridges(scale = .85) 
+```
+
+So far, the boxplot lets us look at the distribution and identify the outliers. 
