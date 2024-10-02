@@ -328,3 +328,56 @@ ggplot(molokai, aes(x = date, y = tmax, color = name)) +
 ![](Vis2_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ## patchwork
+
+Remember facetting
+
+``` r
+ggplot(weather_df, aes(x = tmin, fill = name)) +
+  geom_density(alpha = 0.5) +
+  facet_grid(.~name)
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-12-1.png)<!-- --> This is
+possible because we are using the same variables
+
+When we have different kinds of datasets, that when patchwork is
+essential.
+
+``` r
+tmax_tmin_p = 
+  weather_df |> 
+  ggplot(aes(x = tmax, y = tmin, color = name)) + 
+  geom_point(alpha = .5) +
+  theme(legend.position = "none")
+
+prcp_dens_p = 
+  weather_df |> 
+  filter(prcp > 0) |> 
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density(alpha = .5) + 
+  theme(legend.position = "none")
+
+tmax_date_p = 
+  weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  theme(legend.position = "bottom")
+
+(tmax_tmin_p + prcp_dens_p) / tmax_date_p
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+    ## Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
