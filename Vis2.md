@@ -173,3 +173,113 @@ weather_df |>
 ![](Vis2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ## Theme
+
+``` r
+ggplot_backbone <- weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    color = "Location",
+    caption = "Data from the rnoaa package"
+  ) +
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  ) 
+ggplot_backbone +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+Trying other themes:
+
+``` r
+ggplot_backbone +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+ggplot_backbone +
+  theme_classic() +
+  theme(legend.position = "bottom")
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
+
+``` r
+ggplot_backbone +
+  ggthemes::theme_excel()
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
+
+``` r
+  theme(legend.position = "bottom")
+```
+
+    ## List of 1
+    ##  $ legend.position: chr "bottom"
+    ##  - attr(*, "class")= chr [1:2] "theme" "gg"
+    ##  - attr(*, "complete")= logi FALSE
+    ##  - attr(*, "validate")= logi TRUE
+
+## Learning Assessment:
+
+Revisit the plot showing tmax against date for each location. Use
+labels, scale options, and theme changes to improve the readability of
+this plot.
+
+### Solution:
+
+``` r
+weather_df |> 
+  ggplot(aes(x = date, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) +
+  labs(
+    title = "Temperature plot",
+    x = "Date",
+    y = "Maxiumum daily temperature (C)",
+    color = "Location",
+    caption = "Data from the rnoaa package"
+  ) +
+  
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  ) +
+  scale_y_continuous(
+    breaks = c(-10, 0,  20,  40), 
+    labels = c("-10º C", "0", "20", "40")
+  ) +
+  viridis::scale_color_viridis(discrete = TRUE) + 
+  theme_minimal() + 
+  theme(legend.position = "bottom")
+```
+
+    ## Scale for colour is already present.
+    ## Adding another scale for colour, which will replace the existing scale.
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
