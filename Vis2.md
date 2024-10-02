@@ -381,3 +381,96 @@ tmax_date_p =
     ## (`geom_point()`).
 
 ![](Vis2_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+## Data manipulation
+
+Control your factors.
+
+``` r
+weather_df |> 
+  mutate(
+    name = forcats::fct_relevel(name, c("Molokai_HI", "CentralPark_NY", "Waterhole_WA"))) |> 
+  ggplot(aes(x = name, y = tmax, fill = name)) +
+  geom_violin(alpha = 0.5)
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+What if we want densities for tmin and tmax simultaneously?
+
+``` r
+weather_df |> 
+  pivot_longer(
+    tmax:tmin, 
+    names_to = "type", 
+    values_to = "temperature"
+  ) |> 
+  ggplot(aes(x = temperature, fill = type)) +
+  geom_density(alpha = 0.5) +
+  facet_grid(.~name)
+```
+
+    ## Warning: Removed 34 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+## Revisit the pups
+
+Data from the FAS study
+
+``` r
+pups_df <- read_csv("./data/FAS_pups.csv", na = c("NA", ".", "")) |>
+  janitor::clean_names() |>
+  mutate(
+    sex = 
+      case_match(
+        sex, 
+        1 ~ "male", 
+        2 ~ "female"))
+```
+
+    ## Rows: 313 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (1): Litter Number
+    ## dbl (5): Sex, PD ears, PD eyes, PD pivot, PD walk
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+litters_df <- read_csv("./data/FAS_litters.csv", na = c("NA", ".", "")) |>
+  janitor::clean_names() |> 
+  separate(group, into = c("dose", "day_of_tx"), sep = 3)
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+fas_df = left_join(pups_df, litters_df, by = "litter_number") 
+
+fas_df |> 
+  select(sex, dose, day_of_tx, pd_ears:pd_walk) |> 
+  pivot_longer(
+    pd_ears:pd_walk,
+    names_to = "outcome", 
+    values_to = "pn_day") |> 
+  drop_na() |> 
+  mutate(outcome = forcats::fct_reorder(outcome, pn_day, median)) |> 
+  ggplot(aes(x = dose, y = pn_day)) + 
+  geom_violin() + 
+  facet_grid(day_of_tx ~ outcome)
+```
+
+![](Vis2_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
