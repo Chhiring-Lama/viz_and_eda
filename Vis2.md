@@ -268,8 +268,8 @@ weather_df |>
     discrete = TRUE
   ) +
   scale_y_continuous(
-    breaks = c(-10, 0,  20,  40), 
-    labels = c("-10º C", "0", "20", "40")
+    breaks = c(-10, 0,  10,  20, 30), 
+    labels = c("-10º C", "0", "10", "20", "30")
   ) +
   viridis::scale_color_viridis(discrete = TRUE) + 
   theme_minimal() + 
@@ -283,3 +283,48 @@ weather_df |>
     ## (`geom_point()`).
 
 ![](Vis2_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+## Setting Options
+
+``` r
+library(tidyverse)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+## Data arg. in `geom()`
+
+``` r
+central_park <-
+  weather_df |> 
+  filter(name == "CentralPark_NY")
+
+molokai = 
+  weather_df |> 
+  filter(name == "Molokai_HI")
+
+ggplot(molokai, aes(x = date, y = tmax, color = name)) +
+  geom_point() +
+  geom_line(data = central_park)
+```
+
+    ## Warning: Removed 1 row containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+## patchwork
