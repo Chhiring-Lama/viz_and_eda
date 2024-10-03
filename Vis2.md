@@ -418,6 +418,32 @@ weather_df |>
 
 ![](Vis2_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
+## Revisit pulse dataset
+
+``` r
+pulse_data = 
+  haven::read_sas("./data/public_pulse_data.sas7bdat") |>
+  janitor::clean_names() |>
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m,
+    names_to = "visit", 
+    names_prefix = "bdi_score_",
+    values_to = "bdi") |>
+  select(id, visit, everything()) |>
+  mutate(
+    visit = recode(visit, "bl" = "00m"),
+    visit = factor(visit, levels = str_c(c("00", "01", "06", "12"), "m"))) |>
+  arrange(id, visit)
+
+ggplot(pulse_data, aes(x = visit, y = bdi)) + 
+  geom_boxplot()
+```
+
+    ## Warning: Removed 879 rows containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
+
+![](Vis2_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
 ## Revisit the pups
 
 Data from the FAS study
@@ -473,4 +499,4 @@ fas_df |>
   facet_grid(day_of_tx ~ outcome)
 ```
 
-![](Vis2_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](Vis2_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->

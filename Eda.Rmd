@@ -7,6 +7,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(haven)
 ```
 
 ```{r}
@@ -139,6 +140,116 @@ weather_df |>
                 col.names = c("Month", "Central Park", "Molokai", "Waterhole"))
 ```
 
+## grouped mutate
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  mutate(mean_tmax = mean(tmax, na.rm = TRUE), 
+         centered_tmax = tmax - mean_tmax) |> 
+  ggplot(aes(x = date, y = centered_tmax, color = name)) +
+  geom_point()
+```
+
+## window functions
+
+Find hottest/ coldest days
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  mutate(
+    temp_rank = min_rank(tmax)
+  ) |> 
+  filter(temp_rank < 4)
+
+weather_df |> 
+  group_by(name) |> 
+  filter(min_rank(tmax) < 4) |> 
+  arrange(tmax)
+```
+
+Lagged information (creating a color and shifting down by one row, data needs to be pre-ordered)
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  mutate(
+    lagged_temp = lag(tmax), 
+    temp_change = tmax - lagged_temp
+  ) |> 
+  filter(min_rank(temp_change) < 3) |> 
+  arrange(desc(abs(temp_change)))
+```
+
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  mutate(
+    lagged_temp = lag(tmax), 
+    temp_change = tmax - lagged_temp
+  ) |> 
+  summarize(
+    sd_tmax_change = sd(temp_change, na.rm = TRUE)
+  )
+```
+
+## Learning Assessment1: 
+In the PULSE data, the primary outcome is BDI score; it’s observed over follow-up visits, and we might ask if the typical BDI score values are roughly similar at each. Try to write a code chunk that imports, cleans, and summarizes the PULSE data to examine the mean and median at each visit. Export the results of this in a reader-friendly format.
+
+### Solution:
+
+```{r}
+pulse_df <- read_sas("Data/public_pulse_data.sas7bdat") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m, 
+    names_to = "visit", 
+    values_to = "bdi_score", 
+    names_prefix = "bdi_score_"
+  )
+
+pulse_df |> 
+  group_by(visit) |> 
+  summarize(
+    mean_bdi = mean(bdi_score, na.rm = TRUE), 
+    median_bdi = median(bdi_score, na.rm = TRUE)
+  ) |> 
+    knitr::kable(digits = 1)
+```
+
+## Learning Assessment2: 
+In the FAS data, there are several outcomes of interest; for now, focus on post-natal day on which a pup is able to pivot. Two predictors of interest are the dose level and the day of treatment. Produce a reader-friendly table that quantifies the possible associations between dose, day of treatment, and the ability to pivot.
+
+### Solution:
+```{r}
+litters_df <- read_csv("./data/FAS_litters.csv", na = c("NA", ".", "")) |>
+  janitor::clean_names() |> 
+  separate(group, into = c("dose", "day_of_tx"), sep = 3)
+
+pups_df <- read_csv("./data/FAS_pups.csv", na = c("NA", ".", "")) |>
+  janitor::clean_names() |>
+  mutate(
+    sex = 
+      case_match(
+        sex, 
+        1 ~ "male", 
+        2 ~ "female"))
+
+fas_df = left_join(pups_df, litters_df, by = "litter_number") 
+```
+
+Compute the table needed:
+```{r}
+fas_df |> 
+  drop_na(dose) |> 
+  group_by(dose, day_of_tx) |> 
+  summarize(
+    mean_pivot = mean(pd_pivot, na.rm = TRUE)
+  ) |> 
+  pivot_wider(
+    names_from = day_of_tx, 
+    values_from = mean_pivot, 
+  ) |> 
+  knitr::kable(digits = 2)
+```
 
 
 
