@@ -1,0 +1,105 @@
+---
+title: "EDA"
+author: "Chhiring Lama"
+date: "2024-10-03"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USW00022534", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2021-01-01",
+    date_max = "2022-12-31") |>
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USW00022534 = "Molokai_HI",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10,
+    month = lubridate::floor_date(date, unit = "month")) |>
+  select(name, id, everything())
+
+weather_df
+```
+
+Lets make some plot
+```{r}
+weather_df |> 
+  ggplot(aes(x = prcp)) +
+  geom_histogram()
+```
+
+```{r}
+weather_df |>
+  filter(prcp > 1000)
+```
+
+```{r}
+weather_df |> 
+  filter(tmax > 20, tmax < 30) |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) +
+  geom_point()
+```
+
+Central park and Molakai's tmax is different (more separated) than Waterhole. 
+
+## group_by()
+
+```{r}
+weather_df |> 
+  group_by(name)
+```
+
+counting the values
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  summarize(n_obs = n(), 
+            n_dist = n_distinct(month))
+```
+
+## 2x2 tables
+
+```{r}
+weather_df |> 
+  drop_na(tmax) |> 
+  mutate(
+    cold_cat = case_when(
+      tmax < 5 ~ "cold", 
+      tmax >= 5 ~ "not cold"
+    )
+  ) |> 
+  group_by(name, cold_cat) |> 
+  summarize(count = n()) |> 
+  pivot_wider(
+    names_from = "cold_cat",
+    values_from = "count"
+  )
+```
+
+```{r}
+weather_df |> 
+  drop_na(tmax) |> 
+  mutate(
+    cold_cat = case_when(
+      tmax < 5 ~ "cold", 
+      tmax >= 5 ~ "not cold"
+    )
+  ) |> 
+  janitor::tabyl(name, cold_cat)
+```
+
+## General Numeric Summaries
+
+
+
+
+
