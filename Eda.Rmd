@@ -99,6 +99,46 @@ weather_df |>
 
 ## General Numeric Summaries
 
+Computing other useful summaries:
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE), 
+    median_tmin = median(tmin, a.rm = TRUE), 
+    sd_prcp = sd(prcp, na.rm = TRUE)
+  )
+```
+
+plot one of the summaries: 
+```{r}
+weather_df |> 
+  group_by(name, month) |> 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE), 
+    median_tmin = median(tmin, a.rm = TRUE), 
+    sd_prcp = sd(prcp, na.rm = TRUE)
+  ) |> 
+  ggplot(aes(x = month, y = mean_tmax, color = name)) +
+  geom_point() +
+  geom_line()
+```
+
+Format for readers
+```{r}
+weather_df |> 
+  group_by(name, month) |> 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE)
+  ) |> 
+  pivot_wider(
+    names_from = name,
+    values_from = mean_tmax
+  ) |> 
+  knitr::kable(digits = 3, 
+                col.names = c("Month", "Central Park", "Molokai", "Waterhole"))
+```
+
 
 
 

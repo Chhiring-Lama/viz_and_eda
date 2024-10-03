@@ -185,3 +185,88 @@ weather_df |>
     ##    Waterhole_WA  319      395
 
 ## General Numeric Summaries
+
+Computing other useful summaries:
+
+``` r
+weather_df |> 
+  group_by(name) |> 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE), 
+    median_tmin = median(tmin, a.rm = TRUE), 
+    sd_prcp = sd(prcp, na.rm = TRUE)
+  )
+```
+
+    ## # A tibble: 3 × 4
+    ##   name           mean_tmax median_tmin sd_prcp
+    ##   <chr>              <dbl>       <dbl>   <dbl>
+    ## 1 CentralPark_NY     17.7           10   113. 
+    ## 2 Molokai_HI         28.3           NA    63.2
+    ## 3 Waterhole_WA        7.38          NA   111.
+
+plot one of the summaries:
+
+``` r
+weather_df |> 
+  group_by(name, month) |> 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE), 
+    median_tmin = median(tmin, a.rm = TRUE), 
+    sd_prcp = sd(prcp, na.rm = TRUE)
+  ) |> 
+  ggplot(aes(x = month, y = mean_tmax, color = name)) +
+  geom_point() +
+  geom_line()
+```
+
+    ## `summarise()` has grouped output by 'name'. You can override using the
+    ## `.groups` argument.
+
+![](Eda_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+Format for readers
+
+``` r
+weather_df |> 
+  group_by(name, month) |> 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE)
+  ) |> 
+  pivot_wider(
+    names_from = name,
+    values_from = mean_tmax
+  ) |> 
+  knitr::kable(digits = 3, 
+                col.names = c("Month", "Central Park", "Molokai", "Waterhole"))
+```
+
+    ## `summarise()` has grouped output by 'name'. You can override using the
+    ## `.groups` argument.
+
+| Month      | Central Park | Molokai | Waterhole |
+|:-----------|-------------:|--------:|----------:|
+| 2021-01-01 |        4.271 |  27.616 |     0.800 |
+| 2021-02-01 |        3.868 |  26.368 |    -0.786 |
+| 2021-03-01 |       12.294 |  25.861 |     2.623 |
+| 2021-04-01 |       17.607 |  26.567 |     6.097 |
+| 2021-05-01 |       22.084 |  28.577 |     8.203 |
+| 2021-06-01 |       28.057 |  29.587 |    15.253 |
+| 2021-07-01 |       28.352 |  29.994 |    17.335 |
+| 2021-08-01 |       28.810 |  29.523 |    17.152 |
+| 2021-09-01 |       24.787 |  29.673 |    12.647 |
+| 2021-10-01 |       19.926 |  29.129 |     5.481 |
+| 2021-11-01 |       11.537 |  28.847 |     3.533 |
+| 2021-12-01 |        9.587 |  26.190 |    -2.097 |
+| 2022-01-01 |        2.855 |  26.606 |     3.606 |
+| 2022-02-01 |        7.650 |  26.829 |     2.989 |
+| 2022-03-01 |       11.990 |  27.726 |     3.416 |
+| 2022-04-01 |       15.810 |  27.723 |     2.463 |
+| 2022-05-01 |       22.255 |  28.283 |     5.810 |
+| 2022-06-01 |       26.090 |  29.157 |    11.127 |
+| 2022-07-01 |       30.723 |  29.529 |    15.861 |
+| 2022-08-01 |       30.500 |  30.697 |    18.830 |
+| 2022-09-01 |       24.923 |  30.413 |    15.207 |
+| 2022-10-01 |       17.426 |  29.223 |    11.884 |
+| 2022-11-01 |       14.017 |  27.960 |     2.140 |
+| 2022-12-01 |        6.761 |  27.348 |    -0.460 |
